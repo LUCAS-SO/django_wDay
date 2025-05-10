@@ -1,49 +1,42 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Palabra del Día</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-gray-100 text-gray-900 flex items-center justify-center min-h-screen p-4">
-    <div class="w-full max-w-md p-6 bg-white rounded-2xl shadow-md">
-      <!-- Encabezado con flex para responsividad -->
-      <div class="flex flex-col items-center mb-6">
-        <h1 class="text-3xl font-extrabold text-teal-700">
-          📝 BILINGUAL POCKET
-        </h1>
-        <p class="text-sm text-gray-600 mt-2">
-          ENGLISH-SPANISH - <span class="font-bold">DICTIONARY</span>
-        </p>
-      </div>
-
-      <form method="post" class="flex justify-center mb-6">
-        {% csrf_token %}
-        <button
-          type="submit"
-          class="px-5 py-2 bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-lg transition"
-        >
-          Nueva palabra
-        </button>
-      </form>
-
-      {% if palabra %}
-        <div class="divide-y divide-gray-200">
-          <dl class="space-y-4">
-            <div class="pb-4">
-              <dt class="text-lg font-semibold text-teal-700">English:</dt>
-              <dd class="mt-1 ml-4 text-2xl italic break-words">{{ palabra }}</dd>
-            </div>
-            <div class="pt-4">
-              <dt class="text-lg font-semibold text-teal-700">Spanish:</dt>
-              <dd class="mt-1 ml-4 text-2xl break-words">{{ traduccion }}</dd>
-            </div>
-          </dl>
-        </div>
-      {% endif %}
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BILINGUAL POCKET</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 flex items-center justify-center min-h-screen p-4">
+  <div class="w-full max-w-md p-6 bg-gray-50 rounded-2xl shadow-md">
+    <!-- Encabezado simple -->
+    <div class="flex flex-col items-center mb-6">
+      <h1 class="text-3xl font-extrabold text-red-600">📝 BILINGUAL POCKET</h1>
+      <p class="text-sm text-gray-900 mt-2">ENGLISH–SPANISH • DICTIONARY</p>
     </div>
-  </body>
+
+    <!-- Botón de nueva palabra -->
+    <form method="post" class="flex justify-center mb-6">
+      {% csrf_token %}
+      <button type="submit"
+        class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition">
+        Nueva palabra
+      </button>
+    </form>
+
+    <!-- Diccionario responsivo -->
+    {% if palabra %}
+    <dl class="divide-y divide-gray-200 space-y-4">
+      <div class="pb-4">
+        <dt class="text-lg font-semibold text-red-600">English:</dt>
+        <dd class="mt-1 ml-4 text-2xl break-words text-black">{{ palabra }}</dd>
+      </div>
+      <div class="pt-4">
+        <dt class="text-lg font-semibold text-blue-600">Spanish:</dt>
+        <dd class="mt-1 ml-4 text-2xl break-words text-black">{{ traduccion }}</dd>
+      </div>
+    </dl>
+    {% endif %}
+  </div>
+</body>
 </html>
