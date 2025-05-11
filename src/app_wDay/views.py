@@ -53,3 +53,39 @@ def palabra_del_dia(request):
         "traduccion": traduccion,
         "pronunciacion": pronunciacion,
     })
+
+
+def ejemplos(request, palabra):
+    textos = []
+    # 1) Petición a la Dictionary API
+    resp = requests.get(
+        f"https://api.dictionaryapi.dev/api/v2/entries/en/{palabra}",
+        timeout=5
+    )
+    if resp.status_code == 200:
+        data = resp.json()[0]
+        for meaning in data.get('meanings', []):
+            for definition in meaning.get('definitions', []):
+                example = definition.get('example')
+                if example:
+                    textos.append(example)
+
+    ejemplos = []
+    if textos:
+        # 2) Traducción en lote de todos los ejemplos
+        resultados = translate_client.translate(
+            textos,
+            source_language='en',
+            target_language='es'
+        )
+        # 3) Empaquetamos texto + traducción juntos
+        for original, salida in zip(textos, resultados):
+            ejemplos.append({
+                'text': original,
+                'translation': salida['translatedText']
+            })
+
+    return render(request, "ejemplos.html", {
+        "palabra": palabra,
+        "ejemplos": ejemplos
+    })

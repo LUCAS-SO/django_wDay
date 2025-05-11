@@ -15,28 +15,59 @@
       <p class="text-sm text-gray-900 mt-2">ENGLISH–SPANISH • DICTIONARY</p>
     </div>
 
-    <!-- Botón de nueva palabra -->
-    <form method="post" class="flex justify-center mb-6">
+    <!-- Formulario principal -->
+    <form method="post" class="flex justify-center space-x-4 mb-6">
       {% csrf_token %}
       <button type="submit"
         class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition">
         Nueva palabra
       </button>
+      {% if palabra %}
+      <a href="{% url 'app_wDay:ejemplos' palabra=palabra %}" 
+         class="px-5 py-2 bg-green-600 hover:bg-green-500 text-white font-medium rounded-lg transition">
+        Ver ejemplos
+      </a>
+      {% endif %}
     </form>
 
     <!-- Diccionario responsivo -->
     {% if palabra %}
     <dl class="divide-y divide-gray-200 space-y-4">
+      <!-- Inglés -->
       <div class="pb-4">
         <dt class="text-lg font-semibold text-red-600">English:</dt>
         <dd class="mt-1 ml-4 text-2xl break-words text-black">{{ palabra }}</dd>
       </div>
+      <!-- Pronunciación -->
+      {% if pronunciacion %}
+      <div class="py-4">
+        <dt class="text-lg font-semibold text-blue-600">Pronunciación:</dt>
+        <dd class="mt-1 ml-4 text-xl break-words text-black">{{ pronunciacion }}</dd>
+      </div>
+      {% endif %}
+      <!-- Español -->
       <div class="pt-4">
         <dt class="text-lg font-semibold text-blue-600">Spanish:</dt>
         <dd class="mt-1 ml-4 text-2xl break-words text-black">{{ traduccion }}</dd>
       </div>
     </dl>
     {% endif %}
+
+    <!-- Sección de ejemplos -->
+    {% if ejemplos %}
+    <div class="mt-6 p-4 bg-white rounded-lg border border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-800 mb-3">Ejemplos de uso</h2>
+      <ul class="space-y-4">
+        {% for ejemplo in ejemplos %}
+        <li class="p-4 bg-white rounded-lg border border-gray-200">
+          <p class="font-medium text-gray-800">{{ ejemplo.text }}</p>
+          <p class="mt-1 ml-4 text-gray-600">{{ ejemplo.translation }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
   </div>
 </body>
 </html>
