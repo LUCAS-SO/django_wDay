@@ -11,6 +11,9 @@ KEY_PATH = os.path.join(settings.BASE_DIR, 'planar-catbird-459405-n7-74ac6ad5720
 credentials = service_account.Credentials.from_service_account_file(KEY_PATH)
 translate_client = translate.Client(credentials=credentials)
 
+# Clave de Wordnik API
+WORDNIK_API_KEY = os.getenv('WORDNIK_API_KEY')
+
 @csrf_exempt
 def palabra_del_dia(request):
     palabra = None
@@ -57,7 +60,8 @@ def palabra_del_dia(request):
 
 def ejemplos(request, palabra):
     textos = []
-    # 1) Petición a la Dictionary API
+
+    # 1) Intento con Dictionary API
     resp = requests.get(
         f"https://api.dictionaryapi.dev/api/v2/entries/en/{palabra}",
         timeout=5
@@ -66,20 +70,36 @@ def ejemplos(request, palabra):
         data = resp.json()[0]
         for meaning in data.get('meanings', []):
             for definition in meaning.get('definitions', []):
-                example = definition.get('example')
-                if example:
-                    textos.append(example)
+                ex = definition.get('example')
+                if ex:
+                    textos.append(ex)
 
+    # 2) Si no hay ejemplos, usamos Wordnik
+    if not textos and WORDNIK_API_KEY:
+        wn_url = f"https://api.wordnik.com/v4/word.json/{palabra}/examples"
+        params = {
+            'limit': 5,
+            'includeDuplicates': False,
+            'useCanonical': False,
+            'api_key': WORDNIK_API_KEY,
+        }
+        wn_resp = requests.get(wn_url, params=params, timeout=5)
+        if wn_resp.status_code == 200:
+            wn_data = wn_resp.json()
+            for ex in wn_data.get('examples', []):
+                text = ex.get('text')
+                if text:
+                    textos.append(text)
+
+    # 3) Traducir en lote los ejemplos obtenidos
     ejemplos = []
     if textos:
-        # 2) Traducción en lote de todos los ejemplos
-        resultados = translate_client.translate(
+        traducciones = translate_client.translate(
             textos,
             source_language='en',
             target_language='es'
         )
-        # 3) Empaquetamos texto + traducción juntos
-        for original, salida in zip(textos, resultados):
+        for original, salida in zip(textos, traducciones):
             ejemplos.append({
                 'text': original,
                 'translation': salida['translatedText']
@@ -87,5 +107,5 @@ def ejemplos(request, palabra):
 
     return render(request, "ejemplos.html", {
         "palabra": palabra,
-        "ejemplos": ejemplos
+        "ejemplos": ejemplos,
     })
